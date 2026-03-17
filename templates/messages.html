@@ -7,6 +7,13 @@
     <div class="term-line dim">j/k navigate | v visual select | s star | d delete | Enter open | r mark read | q back</div>
 </div>
 
+<!-- Confirm bar (terminal-style, replaces browser confirm) -->
+<div id="confirm-bar" style="display:none;margin-bottom:8px;padding:8px;border:1px solid var(--term-warning);background:var(--term-input-bg)">
+    <span id="confirm-text" style="color:var(--term-warning)"></span>
+    <button class="terminal-btn" id="confirm-yes" style="margin-left:8px;color:var(--term-error)">y (yes)</button>
+    <button class="terminal-btn" id="confirm-no" style="margin-left:4px">n (no)</button>
+</div>
+
 <!-- Action bar (hidden until visual select) -->
 <div id="action-bar" style="display:none;margin-bottom:8px">
     <form id="action-form" method="POST" action="/admin/messages/action" hx-boost="false">
@@ -15,7 +22,7 @@
         <button type="button" class="terminal-btn" onclick="doAction('star')">★ Star</button>
         <button type="button" class="terminal-btn" onclick="doAction('read')">✓ Read</button>
         <button type="button" class="terminal-btn" onclick="doAction('unread')">○ Unread</button>
-        <button type="button" class="terminal-btn" onclick="if(confirm('Delete selected messages?'))doAction('delete')">✕ Delete</button>
+        <button type="button" class="terminal-btn" onclick="confirmAction('Delete ' + selected.size + ' message(s)?', function(){doAction('delete')})">✕ Delete</button>
         <span id="select-count" style="color:var(--term-fg-dim);margin-left:8px"></span>
     </form>
 </div>
@@ -45,7 +52,7 @@
             <div style="margin-top:8px">
                 <button class="terminal-btn" onclick="singleAction('{{.ID}}','unstar')" style="font-size:12px">☆ Unstar</button>
                 {{if not .Read}}<button class="terminal-btn" onclick="singleAction('{{.ID}}','read')" style="font-size:12px">✓ Read</button>{{end}}
-                <button class="terminal-btn" onclick="if(confirm('Delete?'))singleAction('{{.ID}}','delete')" style="font-size:12px;color:var(--term-error)">✕ Delete</button>
+                <button class="terminal-btn" onclick="confirmAction('Delete this message?', function(){singleAction('{{.ID}}','delete')})" style="font-size:12px;color:var(--term-error)">✕ Delete</button>
             </div>
         </div>
     </div>
@@ -71,7 +78,7 @@
             <div style="margin-top:8px">
                 <button class="terminal-btn" onclick="singleAction('{{.ID}}','star')" style="font-size:12px">★ Star</button>
                 {{if not .Read}}<button class="terminal-btn" onclick="singleAction('{{.ID}}','read')" style="font-size:12px">✓ Read</button>{{end}}
-                <button class="terminal-btn" onclick="if(confirm('Delete?'))singleAction('{{.ID}}','delete')" style="font-size:12px;color:var(--term-error)">✕ Delete</button>
+                <button class="terminal-btn" onclick="confirmAction('Delete this message?', function(){singleAction('{{.ID}}','delete')})" style="font-size:12px;color:var(--term-error)">✕ Delete</button>
             </div>
         </div>
     </div>
@@ -88,6 +95,25 @@ const rows = document.querySelectorAll('.msg-row');
 let idx = -1;
 let visualMode = false;
 let selected = new Set();
+let pendingConfirm = null;
+
+function confirmAction(text, callback) {
+    const bar = document.getElementById('confirm-bar');
+    const textEl = document.getElementById('confirm-text');
+    textEl.textContent = text + ' (y/n)';
+    bar.style.display = 'block';
+    pendingConfirm = callback;
+
+    document.getElementById('confirm-yes').onclick = function() {
+        bar.style.display = 'none';
+        if (pendingConfirm) pendingConfirm();
+        pendingConfirm = null;
+    };
+    document.getElementById('confirm-no').onclick = function() {
+        bar.style.display = 'none';
+        pendingConfirm = null;
+    };
+}
 
 function highlight(newIdx) {
     if (rows.length === 0) return;
@@ -210,9 +236,27 @@ document.addEventListener('keydown', function(e) {
             break;
         case 'd':
             if (idx >= 0 && !visualMode) {
-                if (confirm('Delete this message?')) singleAction(rows[idx].dataset.id, 'delete');
+                const id = rows[idx].dataset.id;
+                confirmAction('Delete this message?', function(){ singleAction(id, 'delete') });
             } else if (selected.size > 0) {
-                doAction('delete');
+                confirmAction('Delete ' + selected.size + ' message(s)?', function(){ doAction('delete') });
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'y':
+            if (pendingConfirm) {
+                document.getElementById('confirm-bar').style.display = 'none';
+                pendingConfirm();
+                pendingConfirm = null;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'n':
+            if (pendingConfirm) {
+                document.getElementById('confirm-bar').style.display = 'none';
+                pendingConfirm = null;
             }
             e.preventDefault();
             e.stopPropagation();
