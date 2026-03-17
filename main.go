@@ -111,6 +111,23 @@ func main() {
 	mux.HandleFunc("/api/vision", handlers.VisionAnalyze)
 	mux.HandleFunc("/api/contact", handlers.ContactSubmit)
 
+	// Sitemap
+	mux.HandleFunc("/sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://igor.ryzhkov.dev/</loc></url>
+  <url><loc>https://igor.ryzhkov.dev/about</loc></url>
+  <url><loc>https://igor.ryzhkov.dev/projects</loc></url>
+  <url><loc>https://igor.ryzhkov.dev/playground</loc></url>
+  <url><loc>https://igor.ryzhkov.dev/contact</loc></url>
+</urlset>`))
+	})
+	mux.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("User-agent: *\nAllow: /\nSitemap: https://igor.ryzhkov.dev/sitemap.xml\n"))
+	})
+
 	// Resume PDF with correct content type
 	mux.HandleFunc("/static/resume.pdf", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/pdf")
