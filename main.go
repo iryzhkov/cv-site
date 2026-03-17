@@ -66,6 +66,9 @@ func main() {
 	}
 	handlers.Templates["gpu-status.html"] = t
 
+	// Set custom 404 handler for middleware
+	middleware.NotFoundHandler = handlers.NotFound
+
 	mux := http.NewServeMux()
 
 	// Pages

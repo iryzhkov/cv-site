@@ -214,11 +214,18 @@ func GetCompany(r *http.Request) string {
 	return v
 }
 
+// NotFoundHandler can be set by the main package to use the custom 404 page.
+var NotFoundHandler http.HandlerFunc
+
 // LocalOnly wraps a handler to only allow local network access.
 func LocalOnly(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !IsLocal(r) {
-			http.NotFound(w, r)
+			if NotFoundHandler != nil {
+				NotFoundHandler(w, r)
+			} else {
+				http.NotFound(w, r)
+			}
 			return
 		}
 		next(w, r)
