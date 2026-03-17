@@ -27,7 +27,7 @@
         { name: 'home', href: '/', aliases: ['home', 'h'] },
         { name: 'about', href: '/about', aliases: ['about', 'a'] },
         { name: 'projects', href: '/projects', aliases: ['projects', 'proj'] },
-        { name: 'play', href: '/playground', aliases: ['play', 'playground', 'chat', 'p'] },
+        { name: 'llm', href: '/playground', aliases: ['llm', 'play', 'playground', 'chat', 'p'] },
         { name: 'contact', href: '/contact', aliases: ['contact', 'mail', 'c'] },
     ];
 

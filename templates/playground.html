@@ -3,7 +3,7 @@
 
 {{define "content"}}
 <div class="term-section">
-    <div class="term-line"><span class="term-prompt">$</span> chat --model <span id="current-model-display" style="color:var(--term-fg-bold)">gemma3:4b</span></div>
+    <div class="term-line"><span class="term-prompt">$</span> chat --model <span id="current-model-display" style="color:var(--term-fg-bold)">{{.PreselectedModel}}</span></div>
     <div class="term-line dim">Connected. Type <span style="color:var(--term-accent)">:help</span> for commands, <span style="color:var(--term-accent)">:model &lt;name&gt;</span> to switch.</div>
     {{if not .HasLive}}
     <div class="term-line" style="color:var(--term-warning)">⚠ Model selection limited — request an access token for full GPU inference.</div>
@@ -13,8 +13,8 @@
 
 <!-- Model/system controls (hidden on desktop, visible on mobile via CSS) -->
 <div class="mobile-model-select" style="display:none;margin-bottom:8px">
-    <select id="model-select" class="terminal-select" hx-get="/api/models" hx-trigger="load" hx-swap="innerHTML">
-        <option value="gemma3:12b">gemma3:12b</option>
+    <select id="model-select" class="terminal-select" hx-get="/api/models?preselect={{.PreselectedModel}}" hx-trigger="load" hx-swap="innerHTML">
+        <option value="{{.PreselectedModel}}">{{.PreselectedModel}}</option>
     </select>
     <select id="system-select" class="terminal-select" style="margin-left:4px">
         {{range .Presets}}

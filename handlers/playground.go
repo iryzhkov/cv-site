@@ -20,10 +20,16 @@ var systemPresets = []struct {
 }
 
 func Playground(w http.ResponseWriter, r *http.Request) {
+	preselect := r.URL.Query().Get("model")
+	if preselect == "" {
+		preselect = preferredModel
+	}
+
 	Templates["playground.html"].ExecuteTemplate(w, "base", map[string]any{
-		"Presets": systemPresets,
-		"Active":  "playground",
-		"HasLive": middleware.HasLiveAccess(r),
+		"Presets":        systemPresets,
+		"Active":         "playground",
+		"HasLive":        middleware.HasLiveAccess(r),
+		"PreselectedModel": preselect,
 	})
 }
 
@@ -34,6 +40,11 @@ const preferredModel = "gemma3:12b"
 func ModelsAPI(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
+	preselect := r.URL.Query().Get("preselect")
+	if preselect == "" {
+		preselect = preferredModel
+	}
+
 	// Restricted: only show the small model
 	if !middleware.HasLiveAccess(r) {
 		w.Write([]byte(`<option value="` + RestrictedModel + `">` + RestrictedModel + `</option>`))
@@ -42,23 +53,23 @@ func ModelsAPI(w http.ResponseWriter, r *http.Request) {
 
 	models, err := ollama.ListModels()
 	if err != nil || len(models) == 0 {
-		w.Write([]byte(`<option value="` + preferredModel + `">` + preferredModel + `</option>`))
+		w.Write([]byte(`<option value="` + preselect + `">` + preselect + `</option>`))
 		return
 	}
 
-	// Write preferred model first if it exists
-	hasPreferred := false
+	// Write preselected model first if it exists
+	hasPreselect := false
 	for _, m := range models {
-		if m.Name == preferredModel {
-			hasPreferred = true
+		if m.Name == preselect {
+			hasPreselect = true
 			break
 		}
 	}
-	if hasPreferred {
-		w.Write([]byte(`<option value="` + preferredModel + `">` + preferredModel + `</option>`))
+	if hasPreselect {
+		w.Write([]byte(`<option value="` + preselect + `" selected>` + preselect + `</option>`))
 	}
 	for _, m := range models {
-		if m.Name == preferredModel {
+		if m.Name == preselect {
 			continue
 		}
 		w.Write([]byte(`<option value="` + m.Name + `">` + m.Name + `</option>`))
