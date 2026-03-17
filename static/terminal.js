@@ -58,7 +58,7 @@
         const titleEl = document.querySelector('.terminal-title');
         if (titleEl) {
             const page = idx >= 0 ? TABS[idx].name : window.location.pathname;
-            titleEl.textContent = 'igor@cv-site:~/' + page;
+            titleEl.textContent = 'igor@ryzhkov.dev:~/' + page;
         }
     }
 

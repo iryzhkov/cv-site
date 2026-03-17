@@ -1,7 +1,7 @@
 [
     {
-        "slug": "cv-site",
-        "title": "AI Portfolio Website",
+        "slug": "personal-site",
+        "title": "Personal Website",
         "tagline": "This website — Go + HTMX with live LLM demos",
         "description": "A portfolio website built with Go and HTMX featuring interactive AI demos powered by a self-hosted RTX 4090. Includes an LLM playground with SSE streaming, model benchmarking, RAG demonstrations, and vision analysis. Designed for sub-millisecond server renders with no JavaScript frameworks.",
         "tags": ["Go", "HTMX", "SSE", "Ollama", "Docker"],
