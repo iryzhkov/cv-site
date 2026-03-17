@@ -5,12 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{block "title" .}}igor@ryzhkov.dev{{end}}</title>
-    <meta name="description" content="Igor Ryzhkov — Machine Learning Engineer. Interactive AI/ML demos, projects, and portfolio.">
-    <link rel="stylesheet" href="/static/style.css?v=4">
+    <meta name="description" content="Igor Ryzhkov — Machine Learning Engineer. Interactive terminal-style portfolio with live LLM demos powered by a self-hosted RTX 4090.">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="igor@ryzhkov.dev">
+    <meta property="og:description" content="ML Engineer — Terminal-style portfolio with live LLM playground, projects, and interactive AI demos.">
+    <meta property="og:url" content="https://igor.ryzhkov.dev">
+    <meta property="og:site_name" content="igor@ryzhkov.dev">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="igor@ryzhkov.dev">
+    <meta name="twitter:description" content="ML Engineer — Terminal-style portfolio with live LLM playground, projects, and interactive AI demos.">
+    <link rel="stylesheet" href="/static/style.css?v=5">
     <script src="/static/htmx.min.js"></script>
     <script src="/static/htmx-sse.js"></script>
     <script src="/static/marked.min.js"></script>
-    <script defer src="/static/terminal.js?v=4"></script>
+    <script defer src="/static/terminal.js?v=5"></script>
 </head>
 <body hx-boost="true">
     <div id="terminal" class="terminal-window">
