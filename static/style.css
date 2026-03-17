@@ -929,8 +929,8 @@ pre, .term-pre, .neofetch-box {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Mobile/desktop status bar toggle */
-.mobile-statusbar { display: none; }
+/* Mobile/desktop toggle */
+.mobile-only { display: none; }
 
 @media (max-width: 640px) {
     html, body { font-size: 14px; }
@@ -939,8 +939,8 @@ pre, .term-pre, .neofetch-box {
     .term-entry .entry-name { min-width: 100px; }
     .term-pre { font-size: 12px; }
 
-    .desktop-statusbar { display: none; }
-    .mobile-statusbar { display: flex; }
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
     .mobile-model-select { display: block !important; }
 }
 
