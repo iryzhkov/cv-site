@@ -56,6 +56,11 @@ func RunBenchmark(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Restrict to small model for external users without access token
+	if !middleware.HasLiveAccess(r) {
+		model = RestrictedModel
+	}
+
 	chatReq := ollama.ChatRequest{
 		Model:    model,
 		Messages: []ollama.ChatMessage{{Role: "user", Content: prompt}},

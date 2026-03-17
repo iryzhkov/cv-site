@@ -11,6 +11,9 @@ import (
 	"github.com/iryzhkov/cv-site/ollama"
 )
 
+// RestrictedModel is the small model used for external users without an access token.
+const RestrictedModel = "qwen3:4b"
+
 type pendingStream struct {
 	Request   ollama.ChatRequest
 	Company   string
@@ -47,6 +50,11 @@ func ChatSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 	if model == "" {
 		model = "gemma3:12b"
+	}
+
+	// Restrict to small model for external users without access token
+	if !middleware.HasLiveAccess(r) {
+		model = RestrictedModel
 	}
 
 	messages := []ollama.ChatMessage{}

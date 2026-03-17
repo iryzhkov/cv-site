@@ -30,15 +30,21 @@ func Playground(w http.ResponseWriter, r *http.Request) {
 const preferredModel = "gemma3:12b"
 
 // ModelsAPI returns model options as HTML for async loading.
-// Puts the preferred model first if available.
+// External users without token only see the restricted model.
 func ModelsAPI(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+
+	// Restricted: only show the small model
+	if !middleware.HasLiveAccess(r) {
+		w.Write([]byte(`<option value="` + RestrictedModel + `">` + RestrictedModel + `</option>`))
+		return
+	}
+
 	models, err := ollama.ListModels()
 	if err != nil || len(models) == 0 {
-		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(`<option value="` + preferredModel + `">` + preferredModel + `</option>`))
 		return
 	}
-	w.Header().Set("Content-Type", "text/html")
 
 	// Write preferred model first if it exists
 	hasPreferred := false
