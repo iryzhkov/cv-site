@@ -39,15 +39,14 @@
         </main>
 
         <!-- Status bar -->
-        <div class="terminal-statusbar">
+        <div class="terminal-statusbar desktop-statusbar">
             <span id="status-mode" class="status-mode">NORMAL</span>
             <input id="command-input" type="text" class="command-input hidden" autocomplete="off" spellcheck="false">
             <span id="status-hints" class="status-hints">:help | h/l tabs | j/k scroll | i insert | theme: paper</span>
-            <!-- Mobile action buttons -->
-            <div class="mobile-actions">
-                <button onclick="Terminal.showPalette()">Menu</button>
-                <button onclick="Terminal.cycleTheme()">Theme</button>
-            </div>
+        </div>
+        <!-- Mobile status bar -->
+        <div class="terminal-statusbar mobile-statusbar">
+            <button class="mobile-menu-btn" onclick="Terminal.showPalette()">☰ Menu</button>
         </div>
     </div>
 </body>

@@ -449,13 +449,16 @@
         palette.className = 'command-palette';
         palette.onclick = (e) => { if (e.target === palette) palette.remove(); };
 
-        const nav = TABS.map(t =>
-            `<button class="cp-item" onclick="window.location.href='${t.href}';this.closest('.command-palette').remove()">` +
-            `<span class="cp-key">${t.name}</span></button>`
-        ).join('');
+        const nav = TABS.map(t => {
+            const active = t.href === window.location.pathname ||
+                (t.href !== '/' && window.location.pathname.startsWith(t.href));
+            return `<button class="cp-item" onclick="window.location.href='${t.href}';this.closest('.command-palette').remove()">` +
+                `<span class="cp-key">${t.name}</span>` +
+                `${active ? '<span class="cp-desc">← here</span>' : ''}</button>`;
+        }).join('');
 
         const themeItems = THEMES.map(t =>
-            `<button class="cp-item" onclick="Terminal.applyTheme('${t}');this.closest('.command-palette').remove()">` +
+            `<button class="cp-item" onclick="Terminal.applyTheme('${t}');document.getElementById('theme-list').innerHTML=this.parentElement.innerHTML">` +
             `<span class="cp-key">${t}</span>` +
             `${t === currentTheme ? '<span class="cp-desc">✓</span>' : ''}</button>`
         ).join('');
@@ -464,13 +467,15 @@
             <div class="command-palette-content">
                 <div class="cp-section">Navigate</div>
                 ${nav}
-                <div class="cp-section">Theme</div>
-                ${themeItems}
                 <div class="cp-section">Actions</div>
-                <button class="cp-item" onclick="showHelp();this.closest('.command-palette').remove()">
-                    <span class="cp-key">Help</span><span class="cp-desc">Keyboard shortcuts</span>
+                <button class="cp-item" onclick="document.getElementById('theme-list').style.display=document.getElementById('theme-list').style.display==='none'?'block':'none'">
+                    <span class="cp-key">Theme</span><span class="cp-desc">${currentTheme} ▸</span>
                 </button>
+                <div id="theme-list" class="cp-subitems" style="display:none">${themeItems}</div>
                 ${typeof window.clearChat === 'function' ? '<button class="cp-item" onclick="window.clearChat();this.closest(\'.command-palette\').remove()"><span class="cp-key">Clear chat</span></button>' : ''}
+                <button class="cp-item" onclick="this.closest('.command-palette').remove()">
+                    <span class="cp-key">Close</span>
+                </button>
             </div>
         `;
         document.body.appendChild(palette);

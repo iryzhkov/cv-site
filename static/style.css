@@ -929,44 +929,36 @@ pre, .term-pre, .neofetch-box {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Mobile/desktop status bar toggle */
+.mobile-statusbar { display: none; }
+
 @media (max-width: 640px) {
     html, body { font-size: 14px; }
     .terminal-content { padding: 12px; }
     .terminal-tabs .tab { padding: 6px 10px; font-size: 12px; }
     .term-entry .entry-name { min-width: 100px; }
-
-    /* Hide desktop status bar hints, show mobile buttons */
-    .terminal-statusbar .status-hints { display: none; }
-    .terminal-statusbar .status-mode { font-size: 11px; }
-    .mobile-actions { display: flex !important; }
-
-    /* Show model dropdown on mobile in playground */
-    .mobile-model-select { display: block !important; }
-
-    /* About page: allow pre to scroll */
     .term-pre { font-size: 12px; }
+
+    .desktop-statusbar { display: none; }
+    .mobile-statusbar { display: flex; }
+    .mobile-model-select { display: block !important; }
 }
 
-/* Mobile action buttons in status bar */
-.mobile-actions {
-    display: none;
-    gap: 4px;
-    flex: 1;
-    justify-content: flex-end;
-}
-
-.mobile-actions button {
+/* Mobile menu button */
+.mobile-menu-btn {
     background: var(--term-input-bg);
     border: 1px solid var(--term-border);
-    color: var(--term-fg-dim);
+    color: var(--term-fg);
     font-family: inherit;
-    font-size: 12px;
-    padding: 3px 10px;
+    font-size: 14px;
+    padding: 6px 16px;
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 3px;
+    width: 100%;
+    text-align: center;
 }
 
-.mobile-actions button:active {
+.mobile-menu-btn:active {
     background: var(--term-selection);
     color: var(--term-fg-bold);
 }
