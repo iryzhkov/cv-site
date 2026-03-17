@@ -6,6 +6,15 @@
     <div class="term-line"><span class="term-prompt">$</span> admin --dashboard</div>
 </div>
 
+<!-- Contact Messages -->
+<div class="term-section">
+    <a href="/admin/messages" class="term-entry" style="display:block;padding:8px">
+        <span style="color:var(--term-accent)">📬 Contact Messages</span>
+        <span style="color:var(--term-fg-bold)"> {{.TotalMessages}} total</span>
+        {{if .UnreadMessages}}<span style="color:var(--term-warning)"> ({{.UnreadMessages}} unread)</span>{{end}}
+    </a>
+</div>
+
 <!-- Stats -->
 <div class="term-section">
     <pre class="term-pre" style="background:none;border:none;padding:0">
@@ -92,15 +101,6 @@
 </pre>
 </div>
 {{end}}
-
-<!-- Contact Messages -->
-<div class="term-section">
-    <a href="/admin/messages" class="term-entry" style="display:block;padding:8px">
-        <span style="color:var(--term-accent)">📬 Contact Messages</span>
-        <span style="color:var(--term-fg-bold)"> {{.TotalMessages}} total</span>
-        {{if .UnreadMessages}}<span style="color:var(--term-warning)"> ({{.UnreadMessages}} unread)</span>{{end}}
-    </a>
-</div>
 
 <!-- Token Management -->
 <div class="term-section">

@@ -153,16 +153,47 @@ function updateActionBar() {
 }
 
 function doAction(action) {
-    document.getElementById('action-ids').value = Array.from(selected).join(',');
-    document.getElementById('action-type').value = action;
-    if (action === 'delete' && !confirm('Delete ' + selected.size + ' message(s)?')) return;
-    document.getElementById('action-form').submit();
+    const ids = Array.from(selected).join(',');
+    applyAction(ids, action);
 }
 
 function singleAction(id, action) {
-    document.getElementById('action-ids').value = id;
-    document.getElementById('action-type').value = action;
-    document.getElementById('action-form').submit();
+    applyAction(id, action);
+}
+
+function applyAction(ids, action) {
+    fetch('/admin/messages/action', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'action=' + action + '&ids=' + encodeURIComponent(ids),
+        redirect: 'manual'
+    }).then(() => {
+        const idList = ids.split(',');
+        idList.forEach(id => {
+            const row = document.querySelector('.msg-row[data-id="' + id + '"]');
+            if (!row) return;
+
+            if (action === 'delete') {
+                row.remove();
+            } else if (action === 'star') {
+                row.querySelector('span').textContent = '★';
+                row.querySelector('span').style.color = 'var(--term-warning)';
+            } else if (action === 'unstar') {
+                row.querySelector('span').textContent = '☆';
+                row.querySelector('span').style.color = 'var(--term-fg-dim)';
+            } else if (action === 'read') {
+                const dot = row.querySelectorAll('span')[1];
+                if (dot) { dot.textContent = '○'; dot.style.color = 'var(--term-fg-dim)'; }
+            } else if (action === 'unread') {
+                const dot = row.querySelectorAll('span')[1];
+                if (dot) { dot.textContent = '●'; dot.style.color = 'var(--term-accent)'; }
+            }
+        });
+        // Clear visual selection
+        selected.clear();
+        rows.forEach(r => r.style.background = '');
+        updateActionBar();
+    });
 }
 
 function toggleExpand(i) {
@@ -180,10 +211,13 @@ function toggleExpand(i) {
         row.dataset.expanded = 'true';
         // Mark as read
         const id = row.dataset.id;
+        const dot = row.querySelectorAll('span')[1];
+        if (dot) { dot.textContent = '○'; dot.style.color = 'var(--term-fg-dim)'; }
         fetch('/admin/messages/action', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: 'action=read&ids=' + id
+            body: 'action=read&ids=' + id,
+            redirect: 'manual'
         });
     }
 }

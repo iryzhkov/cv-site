@@ -252,5 +252,12 @@ func AdminMessageAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	saveContacts(msgs)
-	http.Redirect(w, r, "/admin/messages", http.StatusSeeOther)
+
+	// If fetch request, return JSON; otherwise redirect
+	if r.Header.Get("Accept") == "application/json" || r.Header.Get("X-Requested-With") != "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"ok":true}`))
+	} else {
+		http.Redirect(w, r, "/admin/messages", http.StatusSeeOther)
+	}
 }
