@@ -279,7 +279,7 @@ func AdminCreateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b := make([]byte, 12)
+	b := make([]byte, 4)
 	rand.Read(b)
 	token := hex.EncodeToString(b)
 
@@ -350,7 +350,7 @@ func APICreateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	b := make([]byte, 12)
+	b := make([]byte, 4)
 	rand.Read(b)
 	token := hex.EncodeToString(b)
 
