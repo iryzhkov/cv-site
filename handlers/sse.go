@@ -12,7 +12,7 @@ import (
 )
 
 // RestrictedModel is the small model used for external users without an access token.
-const RestrictedModel = "qwen3:4b"
+const RestrictedModel = "qwen3:8b"
 
 type pendingStream struct {
 	Request   ollama.ChatRequest
