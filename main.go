@@ -13,7 +13,7 @@ import (
 func main() {
 	cfg := LoadConfig()
 	ollama.BaseURL = cfg.OllamaURL
-	handlers.N8NWebhookURL = cfg.N8NWebhookURL
+	handlers.DiscordWebhookURL = cfg.DiscordWebhook
 
 	// Load tokens
 	middleware.LoadTokens()

@@ -1,4 +1,5 @@
 cv-site
 data/analytics.jsonl
 data/tokens.json
+data/contacts.jsonl
 .env

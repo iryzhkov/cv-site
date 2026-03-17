@@ -93,6 +93,26 @@
 </div>
 {{end}}
 
+<!-- Contact Messages -->
+{{if .Contacts}}
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">Contact Messages ({{len .Contacts}})</div>
+    {{range .Contacts}}
+    <div style="margin:8px 0;padding:8px;border:1px solid var(--term-border);border-radius:2px">
+        <div class="term-line">
+            <span style="color:var(--term-fg-bold)">{{.Name}}</span>
+            {{if .Email}}<span style="color:var(--term-fg-dim)"> &lt;{{.Email}}&gt;</span>{{end}}
+            {{if .Company}}<span style="color:var(--term-accent)"> [{{.Company}}]</span>{{end}}
+            {{if .IsSpam}}<span style="color:var(--term-error)"> [SPAM]</span>{{end}}
+            {{if .Notified}}<span style="color:var(--term-success)"> [notified]</span>{{end}}
+        </div>
+        <div class="term-line dim" style="font-size:12px">{{.Timestamp}}</div>
+        <div class="term-line" style="margin-top:4px;white-space:pre-wrap">{{.Message}}</div>
+    </div>
+    {{end}}
+</div>
+{{end}}
+
 <!-- Token Management -->
 <div class="term-section">
     <div class="term-line" style="color:var(--term-accent)">Access Tokens</div>

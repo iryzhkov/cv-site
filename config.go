@@ -6,7 +6,7 @@ type Config struct {
 	Port          string
 	OllamaURL     string
 	AdminKey      string
-	N8NWebhookURL string
+	DiscordWebhook string
 }
 
 func LoadConfig() Config {
@@ -14,7 +14,7 @@ func LoadConfig() Config {
 		Port:          os.Getenv("PORT"),
 		OllamaURL:     os.Getenv("OLLAMA_URL"),
 		AdminKey:      os.Getenv("ADMIN_KEY"),
-		N8NWebhookURL: os.Getenv("N8N_WEBHOOK_URL"),
+		DiscordWebhook: os.Getenv("DISCORD_WEBHOOK"),
 	}
 	if cfg.Port == "" {
 		cfg.Port = "8090"
