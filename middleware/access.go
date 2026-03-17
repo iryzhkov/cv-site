@@ -122,7 +122,12 @@ func isLocalIP(ip string) bool {
 }
 
 func getClientIP(r *http.Request) string {
-	// Check X-Forwarded-For first (for reverse proxy setups)
+	// Cloudflare sets the real client IP in CF-Connecting-IP
+	// This is the most reliable source when behind Cloudflare Tunnel
+	if cfIP := r.Header.Get("CF-Connecting-IP"); cfIP != "" {
+		return cfIP
+	}
+	// Fallback to X-Forwarded-For (first entry is the original client)
 	if xff := r.Header.Get("X-Forwarded-For"); xff != "" {
 		parts := strings.Split(xff, ",")
 		return strings.TrimSpace(parts[0])
