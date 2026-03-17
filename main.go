@@ -111,6 +111,12 @@ func main() {
 	mux.HandleFunc("/api/vision", handlers.VisionAnalyze)
 	mux.HandleFunc("/api/contact", handlers.ContactSubmit)
 
+	// Resume PDF with correct content type
+	mux.HandleFunc("/static/resume.pdf", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/pdf")
+		http.ServeFile(w, r, "static/resume.pdf")
+	})
+
 	// Static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
