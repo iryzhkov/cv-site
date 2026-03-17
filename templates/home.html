@@ -4,7 +4,7 @@
 {{define "content"}}
 <div class="term-section">
     <div class="term-line"><span class="term-prompt">$</span> neofetch</div>
-<pre class="neofetch-box">┌──────────────────────────────┐
+<pre class="neofetch-box desktop-only">┌──────────────────────────────┐
 │ igor@cv-site                 │
 │ ──────────────               │
 │ Role:   ML Engineer          │
@@ -13,6 +13,15 @@
 │ Infra:  RTX 4090, Proxmox    │
 │ Uptime: Self-hosted homelab  │
 └──────────────────────────────┘</pre>
+<pre class="neofetch-box mobile-only" style="display:none">
+  <span style="color:var(--term-accent);font-weight:600">igor@cv-site</span>
+  ──────────────
+  Role:   ML Engineer
+  Focus:  Ads Ranking, Search
+  Stack:  Python, Go, PyTorch
+  Infra:  RTX 4090, Proxmox
+  Uptime: Self-hosted homelab
+</pre>
 </div>
 
 <div class="term-section">
