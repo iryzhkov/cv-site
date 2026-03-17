@@ -440,10 +440,47 @@
         });
     }
 
+    // --- Command Palette (mobile-friendly) ---
+    function showPalette() {
+        document.getElementById('command-palette')?.remove();
+
+        const palette = document.createElement('div');
+        palette.id = 'command-palette';
+        palette.className = 'command-palette';
+        palette.onclick = (e) => { if (e.target === palette) palette.remove(); };
+
+        const nav = TABS.map(t =>
+            `<button class="cp-item" onclick="window.location.href='${t.href}';this.closest('.command-palette').remove()">` +
+            `<span class="cp-key">${t.name}</span></button>`
+        ).join('');
+
+        const themeItems = THEMES.map(t =>
+            `<button class="cp-item" onclick="Terminal.applyTheme('${t}');this.closest('.command-palette').remove()">` +
+            `<span class="cp-key">${t}</span>` +
+            `${t === currentTheme ? '<span class="cp-desc">✓</span>' : ''}</button>`
+        ).join('');
+
+        palette.innerHTML = `
+            <div class="command-palette-content">
+                <div class="cp-section">Navigate</div>
+                ${nav}
+                <div class="cp-section">Theme</div>
+                ${themeItems}
+                <div class="cp-section">Actions</div>
+                <button class="cp-item" onclick="showHelp();this.closest('.command-palette').remove()">
+                    <span class="cp-key">Help</span><span class="cp-desc">Keyboard shortcuts</span>
+                </button>
+                ${typeof window.clearChat === 'function' ? '<button class="cp-item" onclick="window.clearChat();this.closest(\'.command-palette\').remove()"><span class="cp-key">Clear chat</span></button>' : ''}
+            </div>
+        `;
+        document.body.appendChild(palette);
+    }
+
     // Expose for page-level scripts
     window.Terminal = {
         cycleTheme,
         applyTheme,
+        showPalette,
         getThemeColors: () => {
             const s = getComputedStyle(document.documentElement);
             return {

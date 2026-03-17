@@ -43,6 +43,11 @@
             <span id="status-mode" class="status-mode">NORMAL</span>
             <input id="command-input" type="text" class="command-input hidden" autocomplete="off" spellcheck="false">
             <span id="status-hints" class="status-hints">:help | h/l tabs | j/k scroll | i insert | theme: paper</span>
+            <!-- Mobile action buttons -->
+            <div class="mobile-actions">
+                <button onclick="Terminal.showPalette()">Menu</button>
+                <button onclick="Terminal.cycleTheme()">Theme</button>
+            </div>
         </div>
     </div>
 </body>

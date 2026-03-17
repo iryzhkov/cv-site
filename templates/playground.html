@@ -11,16 +11,18 @@
     <div class="term-line dim">{{template "gpu-widget" .}}</div>
 </div>
 
-<!-- Hidden controls (managed via :commands) -->
-<div style="display:none">
-    <select id="model-select" hx-get="/api/models" hx-trigger="load" hx-swap="innerHTML">
+<!-- Model/system controls (hidden on desktop, visible on mobile via CSS) -->
+<div class="mobile-model-select" style="display:none;margin-bottom:8px">
+    <select id="model-select" class="terminal-select" hx-get="/api/models" hx-trigger="load" hx-swap="innerHTML">
         <option value="gemma3:12b">gemma3:12b</option>
     </select>
-    <select id="system-select">
+    <select id="system-select" class="terminal-select" style="margin-left:4px">
         {{range .Presets}}
         <option value="{{.Prompt}}">{{.Name}}</option>
         {{end}}
     </select>
+</div>
+<div style="display:none">
     <div id="loaded-models" hx-get="/api/loaded-models" hx-trigger="load, every 5s" hx-swap="innerHTML"></div>
 </div>
 
