@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: cv-site
+    ports:
+      - "8090:8090"
+    environment:
+      - PORT=8090
+      - OLLAMA_URL=http://192.168.70.130:8080
+      - ADMIN_KEY=${ADMIN_KEY:-changeme}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

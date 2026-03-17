@@ -1,0 +1,64 @@
+{{define "title"}}igor@cv-site — 404{{end}}
+{{define "page-id"}}???{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> cat /neuron/not/found</div>
+    <div class="term-line" style="color:var(--term-error)">bash: /neuron/not/found: No such file or directory</div>
+    <div class="term-line dim">(exit code 127)</div>
+</div>
+
+<div class="term-section" style="text-align:center;padding:24px 0">
+    <svg viewBox="0 0 400 250" style="width:100%;max-width:360px;margin:0 auto" xmlns="http://www.w3.org/2000/svg">
+        <!-- Edges -->
+        <line x1="60" y1="60" x2="170" y2="40" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="60" y1="60" x2="170" y2="125" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="60" y1="190" x2="170" y2="125" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="60" y1="190" x2="170" y2="210" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="170" y1="40" x2="280" y2="80" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="170" y1="40" x2="280" y2="170" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="170" y1="125" x2="280" y2="80" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="170" y1="125" x2="280" y2="170" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="170" y1="210" x2="280" y2="170" stroke="var(--term-border)" stroke-width="2"/>
+        <line x1="280" y1="80" x2="360" y2="125" stroke="var(--term-border)" stroke-width="2" stroke-dasharray="4 4" opacity="0.4"/>
+        <line x1="280" y1="170" x2="360" y2="125" stroke="var(--term-border)" stroke-width="2" stroke-dasharray="4 4" opacity="0.4"/>
+
+        <!-- Nodes -->
+        <circle cx="60" cy="60" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+        <circle cx="60" cy="190" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+        <circle cx="170" cy="40" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+        <circle cx="170" cy="125" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+        <circle cx="170" cy="210" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+        <circle cx="280" cy="80" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+        <circle cx="280" cy="170" r="16" fill="var(--term-bg)" stroke="var(--term-accent)" stroke-width="2"/>
+
+        <!-- Missing node -->
+        <circle cx="360" cy="125" r="16" fill="none" stroke="var(--term-error)" stroke-width="2" class="missing-node" opacity="0.6"/>
+        <text x="360" y="130" text-anchor="middle" fill="var(--term-error)" font-size="16" font-weight="bold" opacity="0.5">?</text>
+
+        <!-- Traveling packets -->
+        <circle r="3" fill="var(--term-accent)" opacity="0.8">
+            <animateMotion dur="2s" repeatCount="indefinite"><mpath href="#p1"/></animateMotion>
+        </circle>
+        <circle r="3" fill="var(--term-accent)" opacity="0.6">
+            <animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#p2"/></animateMotion>
+        </circle>
+
+        <!-- Lost packets -->
+        <circle cx="340" cy="110" r="3" fill="var(--term-error)" class="lost-packet" opacity="0.6"/>
+        <circle cx="355" cy="140" r="3" fill="var(--term-error)" class="lost-packet" opacity="0.4" style="animation-delay:-1s"/>
+
+        <path id="p1" d="M60,60 L170,40 L280,80" fill="none" stroke="none"/>
+        <path id="p2" d="M60,190 L170,125 L280,170" fill="none" stroke="none"/>
+    </svg>
+
+    <div style="margin-top:16px">
+        <span style="font-size:32px;color:var(--term-fg-bold)">404</span>
+        <div style="color:var(--term-fg-dim);margin-top:4px">Neuron Not Found</div>
+    </div>
+</div>
+
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> <a href="/" style="color:var(--term-fg)">cd ~</a></div>
+</div>
+{{end}}

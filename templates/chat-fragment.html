@@ -1,0 +1,64 @@
+{{define "chat-fragment"}}
+<!-- User message -->
+<div class="chat-user term-line">
+    <span class="term-prompt">&gt;</span> {{.Prompt}}
+</div>
+
+<!-- Loading animation (only if model not loaded) -->
+{{if not .ModelLoaded}}
+<div id="loading-{{.StreamID}}" class="term-line dim" style="padding:16px 0">
+    <span class="spinner"></span> Loading model weights into GPU...
+</div>
+{{end}}
+
+<!-- Assistant response -->
+<div class="chat-response">
+    <div class="prose-container cursor-blink {{if not .ModelLoaded}}hidden{{end}}" id="response-{{.StreamID}}"></div>
+    <div class="chat-meta" id="meta-{{.StreamID}}"></div>
+</div>
+
+<script>
+(function() {
+    const streamID = "{{.StreamID}}";
+    const loadingEl = document.getElementById("loading-" + streamID);
+    const el = document.getElementById("response-" + streamID);
+    const metaEl = document.getElementById("meta-" + streamID);
+    let raw = "";
+    let firstToken = true;
+
+    const source = new EventSource("/api/stream?id=" + streamID);
+
+    source.addEventListener("token", function(e) {
+        if (firstToken) {
+            if (loadingEl) loadingEl.remove();
+            el.classList.remove("hidden");
+            firstToken = false;
+        }
+        try { raw += JSON.parse(e.data); } catch { raw += e.data; }
+        el.innerHTML = marked.parse(raw);
+    });
+
+    source.addEventListener("done", function(e) {
+        source.close();
+        if (firstToken) {
+            if (loadingEl) loadingEl.remove();
+            el.classList.remove("hidden");
+        }
+        el.classList.remove("cursor-blink");
+        el.innerHTML = marked.parse(raw);
+        metaEl.innerHTML = e.data;
+        if (window.conversationHistory) {
+            window.conversationHistory.push({role: "assistant", content: raw});
+        }
+        if (typeof window.saveChat === 'function') window.saveChat();
+    });
+
+    source.addEventListener("error", function() {
+        source.close();
+        if (loadingEl) loadingEl.remove();
+        el.classList.remove("hidden", "cursor-blink");
+        if (!raw) el.innerHTML = '<span style="color:var(--term-error)">Connection lost</span>';
+    });
+})();
+</script>
+{{end}}

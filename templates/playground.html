@@ -1,0 +1,119 @@
+{{define "title"}}igor@cv-site:~/playground{{end}}
+{{define "page-id"}}play{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> chat --model <span id="current-model-display" style="color:var(--term-fg-bold)">gemma3:4b</span></div>
+    <div class="term-line dim">Connected. Type <span style="color:var(--term-accent)">:help</span> for commands, <span style="color:var(--term-accent)">:model &lt;name&gt;</span> to switch.</div>
+    {{if not .HasLive}}
+    <div class="term-line" style="color:var(--term-warning)">⚠ Model selection limited — request an access token for full GPU inference.</div>
+    {{end}}
+    <div class="term-line dim">{{template "gpu-widget" .}}</div>
+</div>
+
+<!-- Hidden controls (managed via :commands) -->
+<div style="display:none">
+    <select id="model-select" hx-get="/api/models" hx-trigger="load" hx-swap="innerHTML">
+        <option value="gemma3:12b">gemma3:12b</option>
+    </select>
+    <select id="system-select">
+        {{range .Presets}}
+        <option value="{{.Prompt}}">{{.Name}}</option>
+        {{end}}
+    </select>
+    <div id="loaded-models" hx-get="/api/loaded-models" hx-trigger="load, every 5s" hx-swap="innerHTML"></div>
+</div>
+
+<!-- Chat messages -->
+<div id="chat-messages" style="min-height:100px">
+</div>
+
+<!-- Prompt input -->
+<div class="term-section" style="margin-top:8px">
+    <form id="chat-form" hx-post="/api/chat" hx-target="#chat-messages" hx-swap="beforeend" style="display:flex;align-items:center;gap:4px">
+        <input type="hidden" name="model" id="model-input" value="">
+        <input type="hidden" name="system" id="system-input" value="">
+        <input type="hidden" name="history" id="history-input" value="[]">
+        <span class="term-prompt">&gt;</span>
+        <input type="text" name="prompt" id="prompt-input"
+               class="terminal-input" placeholder="" autocomplete="off">
+    </form>
+</div>
+
+<script>
+const modelSelect = document.getElementById('model-select');
+const systemSelect = document.getElementById('system-select');
+const modelInput = document.getElementById('model-input');
+const systemInput = document.getElementById('system-input');
+const historyInput = document.getElementById('history-input');
+const promptInput = document.getElementById('prompt-input');
+const chatMessages = document.getElementById('chat-messages');
+const modelDisplay = document.getElementById('current-model-display');
+
+function syncInputs() {
+    modelInput.value = modelSelect.value;
+    systemInput.value = systemSelect.value;
+    if (modelDisplay) modelDisplay.textContent = modelSelect.value;
+}
+modelSelect.addEventListener('change', syncInputs);
+systemSelect.addEventListener('change', syncInputs);
+syncInputs();
+
+// Re-sync after HTMX loads the model list
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target === modelSelect) {
+        syncInputs();
+    }
+});
+
+// Restore chat state from sessionStorage
+window.conversationHistory = JSON.parse(sessionStorage.getItem('cv-chat-history') || '[]');
+
+window.saveChat = function() {
+    sessionStorage.setItem('cv-chat-history', JSON.stringify(window.conversationHistory));
+    sessionStorage.setItem('cv-chat-html', chatMessages.innerHTML);
+};
+
+// Restore previous chat HTML if available
+const savedHTML = sessionStorage.getItem('cv-chat-html');
+if (savedHTML && window.conversationHistory.length > 0) {
+    chatMessages.innerHTML = savedHTML;
+}
+
+let pendingPrompt = '';
+
+document.getElementById('chat-form').addEventListener('htmx:beforeRequest', function() {
+    historyInput.value = JSON.stringify(window.conversationHistory);
+    pendingPrompt = promptInput.value;
+    promptInput.value = '';
+    promptInput.focus();
+});
+
+document.getElementById('chat-form').addEventListener('htmx:afterSwap', function() {
+    if (pendingPrompt) {
+        window.conversationHistory.push({role: "user", content: pendingPrompt});
+        pendingPrompt = '';
+    }
+    saveChat();
+    const content = document.getElementById('terminal-content');
+    if (content) content.scrollTop = content.scrollHeight;
+});
+
+// Auto-scroll as tokens stream
+const observer = new MutationObserver(function() {
+    const content = document.getElementById('terminal-content');
+    if (content) content.scrollTop = content.scrollHeight;
+});
+observer.observe(chatMessages, { childList: true, subtree: true, characterData: true });
+
+// Save after streaming completes (done event adds to history)
+document.body.addEventListener('htmx:sseClose', function() { saveChat(); });
+
+window.clearChat = function() {
+    window.conversationHistory = [];
+    chatMessages.innerHTML = '';
+    sessionStorage.removeItem('cv-chat-history');
+    sessionStorage.removeItem('cv-chat-html');
+};
+</script>
+{{end}}

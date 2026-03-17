@@ -1,0 +1,4 @@
+cv-site
+data/analytics.jsonl
+data/tokens.json
+.env

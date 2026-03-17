@@ -1,0 +1,51 @@
+{{define "title"}}igor@cv-site:~/projects/{{.Project.Slug}}{{end}}
+{{define "page-id"}}projects/{{.Project.Slug}}{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> cat ~/projects/{{.Project.Slug}}/README.md</div>
+</div>
+
+<div class="term-section prose-container">
+    <h1 style="color:var(--term-accent);margin-top:0">{{.Project.Title}}</h1>
+    <p style="color:var(--term-fg-dim)">{{.Project.Tagline}}</p>
+
+    <h2>About</h2>
+    <p>{{.Project.Description}}</p>
+
+    {{if .Project.Diagram}}
+    <h2>Architecture</h2>
+    <pre class="neofetch-box">{{.Project.Diagram}}</pre>
+    {{end}}
+
+    {{if .Project.Features}}
+    <h2>Features</h2>
+    <ul>
+        {{range .Project.Features}}
+        <li>{{.}}</li>
+        {{end}}
+    </ul>
+    {{end}}
+
+    <h2>Links</h2>
+    {{if .Project.GitHub}}<div class="term-line"><a href="{{.Project.GitHub}}">[GitHub]</a> {{.Project.GitHub}}</div>{{end}}
+    {{if .Project.Link}}<div class="term-line"><a href="{{.Project.Link}}">[Demo]</a> {{.Project.Link}}</div>{{end}}
+</div>
+
+<div class="term-section" style="margin-top:24px">
+    <div class="term-line"><span class="term-prompt">$</span> <a href="/projects" style="color:var(--term-fg)">cd ..</a> <span style="color:var(--term-fg-dim)">(q)</span></div>
+</div>
+
+<script>
+document.addEventListener('keydown', function(e) {
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (!document.getElementById('command-input')?.classList.contains('hidden')) return;
+    if (e.key === 'q') {
+        window.location.href = '/projects';
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}, true);
+</script>
+{{end}}

@@ -1,0 +1,72 @@
+[
+    {
+        "slug": "cv-site",
+        "title": "AI Portfolio Website",
+        "tagline": "This website — Go + HTMX with live LLM demos",
+        "description": "A portfolio website built with Go and HTMX featuring interactive AI demos powered by a self-hosted RTX 4090. Includes an LLM playground with SSE streaming, model benchmarking, RAG demonstrations, and vision analysis. Designed for sub-millisecond server renders with no JavaScript frameworks.",
+        "tags": ["Go", "HTMX", "SSE", "Ollama", "Docker"],
+        "github": "https://github.com/iryzhkov/cv-site",
+        "features": [
+            "Token-by-token SSE streaming from Ollama",
+            "GPU/CPU failover with real-time status monitoring",
+            "Interactive RAG and Vision demos",
+            "Company-specific access gating with analytics",
+            "Sub-millisecond server-side rendering",
+            "Dark theme, mobile-first responsive design"
+        ]
+    },
+    {
+        "slug": "86-challenge",
+        "title": "86 Challenge Telemetry",
+        "tagline": "Telemetry analysis for GR86/BRZ time trial community",
+        "description": "A web application for the 86 Challenge time trial community. Parses VBO telemetry files from Vbox GPS loggers, provides lap analysis with split times, driver comparisons, and a grip simulation engine that models optimal laps based on recorded telemetry data.",
+        "tags": ["Go", "HTMX", "Chart.js", "PostgreSQL", "Leaflet"],
+        "github": "https://github.com/iryzhkov/86-challenge",
+        "link": "https://86.ryzhkov.dev",
+        "features": [
+            "VBO telemetry file parsing and analysis",
+            "Interactive track maps with Leaflet.js",
+            "Lap comparison with split-time breakdowns",
+            "Grip simulation engine for optimal lap modeling",
+            "Driver profiles and event management",
+            "Automated event scraping from 86challenge.us"
+        ]
+    },
+    {
+        "slug": "ollama-proxy",
+        "title": "Ollama Inference Proxy",
+        "tagline": "GPU/CPU failover proxy for Ollama with model rewriting",
+        "description": "A lightweight Go reverse proxy that sits in front of multiple Ollama instances. Routes requests to a GPU backend (RTX 4090 via WSL2) with automatic failover to a CPU backend. Rewrites model names on failover to use smaller, CPU-appropriate models.",
+        "tags": ["Go", "Ollama", "Reverse Proxy", "GPU"],
+        "github": "https://github.com/iryzhkov/ollama-proxy",
+        "features": [
+            "Health-check based GPU/CPU failover",
+            "Automatic model rewriting on CPU fallback",
+            "Transparent streaming proxy (SSE/NDJSON)",
+            "Sub-3s health check timeout",
+            "Single binary, zero dependencies"
+        ]
+    },
+    {
+        "slug": "homelab",
+        "title": "Homelab Infrastructure",
+        "tagline": "Multi-node Proxmox cluster with 30+ containers and GPU inference",
+        "description": "A self-hosted infrastructure running on three physical machines: an HP Elite Mini (Proxmox node), an HP Workstation (Proxmox node), and a gaming PC with an RTX 4090 for GPU inference. The two Proxmox nodes form a cluster running 6+ VMs and multiple LXC containers across VLANs, hosting 30+ Docker containers for media, productivity, home automation, and AI workloads. External access is managed through Traefik reverse proxy, Cloudflare Tunnels, and a Nebula mesh VPN spanning homelab, OCI cloud, and a travel router.",
+        "diagram": "                    ┌──────────────────┐\n                    │ Cloudflare       │\n                    │ Tunnel + DNS     │\n                    └────────┬─────────┘\n                             │\n  ┌──────────────────────────┼──────────────────────────┐\n  │                   Home Network                      │\n  │                                                     │\n  │  HP Elite Mini (Proxmox)   HP Workstation (Proxmox) │\n  │  ├─ VM: homelab (31ct)     ├─ VM: radio             │\n  │  ├─ VM: home-assistant     ├─ CT: adguard           │\n  │  ├─ VM: traefik proxy      └─ CT: ollama-proxy ─┐   │\n  │  ├─ CT: adguard (x2)                            │   │\n  │  ├─ CT: mqtt                                    │   │\n  │  └─ CT: zigbee2mqtt                             │   │\n  │                                                 │   │\n  │  Gaming PC (RTX 4090, Windows + WSL2)           │   │\n  │  └─ Ollama (GPU inference) ◄────────────────────┘   │\n  │     gemma3:12b, qwen3:8b, llama3.1:8b, ...          │\n  │                                                     │\n  │  Traefik ◄── *.ryzhkov.dev (:80/:443)               │\n  └──────────────────────┬──────────────────────────────┘\n                         │ Nebula VPN\n             ┌───────────┴───────────┐\n             │                       │\n       ┌─────┴─────┐          ┌──────┴──────┐\n       │ OCI Cloud │          │ GL.iNet     │\n       │ Lighthouse│          │ Travel      │\n       │ Caddy     │          │ Router      │\n       └───────────┘          └─────────────┘",
+        "tags": ["Proxmox", "Docker", "Nebula VPN", "Traefik", "Go", "RTX 4090"],
+        "features": [
+            "2-node Proxmox VE cluster (HP Elite Mini + HP Workstation) with shared storage",
+            "Gaming PC (RTX 4090) running Ollama for GPU-accelerated LLM inference via WSL2",
+            "6+ VMs: main homelab server (31 Docker containers), Home Assistant OS, Traefik proxy, and more",
+            "LXC containers: AdGuard DNS (x2), Mosquitto MQTT, Zigbee2MQTT, Ollama proxy",
+            "VLAN-segmented networking: management (VLAN 1), public-facing (VLAN 20), services (VLAN 70), gaming PC (VLAN 90)",
+            "30+ Docker services: Immich, Authentik, Forgejo, Miniflux, Hugo blog, n8n, Uptime Kuma, and more",
+            "Nebula mesh VPN connecting homelab, OCI lighthouse, and travel router",
+            "Traefik reverse proxy with Let's Encrypt for *.ryzhkov.dev, Caddy on OCI",
+            "Cloudflare Tunnels for secure external access without WAN exposure",
+            "homelab-ctl: custom Go TUI/MCP tool for managing Docker containers across all VMs with vim-style navigation",
+            "Automated backups to Backblaze B2 via rclone (2x weekly)",
+            "Home Assistant with Zigbee (ZBT-2), MQTT, and smart home automations"
+        ]
+    }
+]

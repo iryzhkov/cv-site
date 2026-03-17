@@ -1,0 +1,61 @@
+{{define "title"}}igor@cv-site:~/projects{{end}}
+{{define "page-id"}}projects{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> ls -la ~/projects/</div>
+    <div class="term-line dim">total {{len .Projects}}</div>
+</div>
+
+<div class="term-section" id="project-list">
+    {{range .Projects}}
+    <a href="/projects/{{.Slug}}" class="term-entry project-item">
+        <span class="entry-name">{{.Slug}}/</span>
+        <span class="entry-tags">{{range $i, $t := .Tags}}{{if $i}}, {{end}}{{$t}}{{end}}</span>
+    </a>
+    {{end}}
+</div>
+
+<div class="term-section">
+    <div class="term-line dim">j/k navigate, Enter open</div>
+</div>
+
+<script>
+(function() {
+    const items = document.querySelectorAll('.project-item');
+    let idx = -1;
+
+    function highlight(newIdx) {
+        if (items.length === 0) return;
+        if (newIdx < 0) newIdx = items.length - 1;
+        if (newIdx >= items.length) newIdx = 0;
+        items.forEach(el => el.classList.remove('focused'));
+        idx = newIdx;
+        items[idx].classList.add('focused');
+        items[idx].scrollIntoView({ block: 'nearest' });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        // Skip if in input
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+        // Skip if in command mode
+        if (!document.getElementById('command-input')?.classList.contains('hidden')) return;
+
+        if (e.key === 'j') {
+            highlight(idx + 1);
+            e.preventDefault();
+            e.stopPropagation();
+        } else if (e.key === 'k') {
+            highlight(idx - 1);
+            e.preventDefault();
+            e.stopPropagation();
+        } else if (e.key === 'Enter' && idx >= 0) {
+            items[idx].click();
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true); // capture phase to intercept before terminal.js
+})();
+</script>
+{{end}}

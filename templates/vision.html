@@ -1,0 +1,73 @@
+{{define "title"}}igor@cv-site:~/vision{{end}}
+{{define "page-id"}}vision{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> vision --analyze {{template "gpu-widget" .}}</div>
+</div>
+
+<div class="term-section">
+    <form hx-post="/api/vision" hx-target="#vision-results" hx-swap="innerHTML"
+          hx-encoding="multipart/form-data" hx-indicator="#vision-loading">
+        <div class="term-line dim">Model:</div>
+        <select name="model" class="terminal-select" hx-get="/api/models" hx-trigger="load" hx-swap="innerHTML">
+            <option value="gemma3:4b">loading...</option>
+        </select>
+
+        <div class="term-line dim" style="margin-top:12px">Prompt:</div>
+        <input type="text" name="prompt" class="terminal-input" value="Describe this image in detail. What do you see?"
+               style="border-bottom:1px solid var(--term-border);padding:4px 0;margin-bottom:12px">
+
+        <div class="term-line dim">Image:</div>
+        <div id="drop-zone" class="upload-zone" onclick="document.getElementById('image-input').click()">
+            <input type="file" name="image" id="image-input" accept="image/*" style="display:none"
+                   onchange="previewImage(this)">
+            <div id="upload-placeholder">
+                ┌─────────────────────────────────┐<br>
+                │                                 │<br>
+                │     Drop image or click here    │<br>
+                │     PNG, JPG, WebP (max 10MB)   │<br>
+                │                                 │<br>
+                └─────────────────────────────────┘
+            </div>
+            <div id="image-preview" style="display:none">
+                <img id="preview-img" style="max-height:200px">
+            </div>
+        </div>
+
+        <div style="margin-top:12px">
+            <button type="submit" class="terminal-btn">[Analyze]</button>
+        </div>
+    </form>
+</div>
+
+<div id="vision-loading" class="htmx-indicator term-line dim"><span class="spinner"></span> Analyzing image...</div>
+
+<div id="vision-results"></div>
+
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('upload-placeholder').style.display = 'none';
+            document.getElementById('image-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+const dropZone = document.getElementById('drop-zone');
+['dragenter','dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+});
+['dragleave','drop'].forEach(evt => {
+    dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+});
+dropZone.addEventListener('drop', e => {
+    const input = document.getElementById('image-input');
+    input.files = e.dataTransfer.files;
+    previewImage(input);
+});
+</script>
+{{end}}

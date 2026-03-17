@@ -1,0 +1,6 @@
+{{define "benchmark-result"}}
+<div class="term-line" data-model="{{.Model}}" data-prompt="{{.Prompt}}"
+     data-tok-per-sec="{{printf "%.1f" .TokPerSec}}" data-total-ms="{{.TotalTimeMs}}">
+    <span style="color:var(--term-success)">{{.Model}}</span> / {{.Prompt}}: <span style="color:var(--term-accent)">{{printf "%.1f" .TokPerSec}} tok/s</span> | {{.TotalTokens}} tokens | {{.TotalTimeMs}}ms
+</div>
+{{end}}

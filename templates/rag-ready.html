@@ -1,0 +1,19 @@
+{{define "rag-ready"}}
+<div class="term-section">
+    <div class="term-line"><span style="color:var(--term-success)">[OK]</span> Indexed {{.ChunkCount}} chunks</div>
+</div>
+
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> rag --query</div>
+    <form hx-post="/api/rag/query" hx-target="#rag-results" hx-swap="innerHTML"
+          hx-indicator="#rag-query-loading" style="display:flex;align-items:center;gap:4px;margin-top:4px">
+        <input type="hidden" name="session_id" value="{{.SessionID}}">
+        <span class="term-prompt">&gt;</span>
+        <input type="text" name="query" class="terminal-input" placeholder="Ask about the document..." autocomplete="off">
+    </form>
+</div>
+
+<div id="rag-query-loading" class="htmx-indicator term-line dim"><span class="spinner"></span> Searching chunks...</div>
+
+<div id="rag-results"></div>
+{{end}}

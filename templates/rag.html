@@ -1,0 +1,24 @@
+{{define "title"}}igor@cv-site:~/rag{{end}}
+{{define "page-id"}}rag{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> rag --ingest {{template "gpu-widget" .}}</div>
+    <div class="term-line dim">Paste document below, then click [Index]</div>
+</div>
+
+<div id="rag-upload" class="term-section">
+    <form hx-post="/api/rag/ingest" hx-target="#rag-workspace" hx-swap="innerHTML"
+          hx-indicator="#rag-loading">
+        <textarea name="document" rows="8" class="terminal-textarea"
+                  placeholder="Paste document text here..."></textarea>
+        <div style="margin-top:8px">
+            <button type="submit" class="terminal-btn">[Index Document]</button>
+        </div>
+    </form>
+</div>
+
+<div id="rag-loading" class="htmx-indicator term-line dim"><span class="spinner"></span> Embedding chunks...</div>
+
+<div id="rag-workspace"></div>
+{{end}}

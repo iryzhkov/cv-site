@@ -1,0 +1,112 @@
+{{define "title"}}igor@cv-site:~/benchmarks{{end}}
+{{define "page-id"}}bench{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> benchmark {{template "gpu-widget" .}}</div>
+    {{if not .HasLive}}
+    <div class="term-line" style="color:var(--term-warning)">⚠ Model selection limited — request an access token for full GPU inference.</div>
+    {{end}}
+</div>
+
+<div class="term-section">
+    <div class="term-line dim">Model:</div>
+    <select id="bench-model" class="terminal-select" hx-get="/api/models" hx-trigger="load" hx-swap="innerHTML">
+        <option value="qwen3:4b">loading...</option>
+    </select>
+</div>
+
+<div class="term-section">
+    <div class="term-line dim">Prompt:</div>
+    <select id="bench-prompt" class="terminal-select">
+        {{range .Prompts}}
+        <option value="{{.Prompt}}" data-name="{{.Name}}">{{.Name}}</option>
+        {{end}}
+    </select>
+</div>
+
+<form id="bench-form" hx-post="/api/benchmark" hx-target="#bench-results" hx-swap="beforeend"
+      hx-indicator="#bench-loading" style="margin:12px 0">
+    <input type="hidden" name="model" id="bench-model-input">
+    <input type="hidden" name="prompt" id="bench-prompt-input">
+    <input type="hidden" name="prompt_name" id="bench-prompt-name-input">
+    <button type="submit" class="terminal-btn">[Run Benchmark]</button>
+</form>
+
+<div id="bench-loading" class="htmx-indicator term-line dim"><span class="spinner"></span> Running benchmark...</div>
+
+<div id="bench-results"></div>
+
+<div id="chart-container" style="display:none;margin-top:16px;border:1px solid var(--term-border);padding:12px">
+    <div class="term-line dim" style="margin-bottom:8px">Results Comparison</div>
+    <canvas id="bench-chart" height="200"></canvas>
+</div>
+
+<script src="/static/chart.min.js"></script>
+<script>
+const modelSel = document.getElementById('bench-model');
+const promptSel = document.getElementById('bench-prompt');
+const modelIn = document.getElementById('bench-model-input');
+const promptIn = document.getElementById('bench-prompt-input');
+const promptNameIn = document.getElementById('bench-prompt-name-input');
+
+function syncBench() {
+    modelIn.value = modelSel.value;
+    promptIn.value = promptSel.value;
+    promptNameIn.value = promptSel.options[promptSel.selectedIndex]?.dataset?.name || '';
+}
+modelSel.addEventListener('change', syncBench);
+promptSel.addEventListener('change', syncBench);
+syncBench();
+
+// Re-sync after HTMX loads the model list
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target === modelSel) syncBench();
+});
+
+let benchResults = [];
+let chart = null;
+
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id !== 'bench-results') return;
+    const results = document.querySelectorAll('[data-tok-per-sec]');
+    const latest = results[results.length - 1];
+    if (!latest) return;
+    benchResults.push({
+        label: latest.dataset.model + ' / ' + latest.dataset.prompt,
+        tokPerSec: parseFloat(latest.dataset.tokPerSec),
+    });
+    updateChart();
+});
+
+function updateChart() {
+    if (benchResults.length < 1) return;
+    document.getElementById('chart-container').style.display = 'block';
+    const ctx = document.getElementById('bench-chart').getContext('2d');
+    const colors = window.Terminal?.getThemeColors() || {accent:'#7aa2f7',fgDim:'#565f89',border:'#292e42',bg:'#1a1b26'};
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: benchResults.map(r => r.label),
+            datasets: [{
+                label: 'tok/s',
+                data: benchResults.map(r => r.tokPerSec),
+                backgroundColor: colors.accent + '80',
+                borderColor: colors.accent,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: { duration: 300 },
+            plugins: { legend: { labels: { color: colors.fgDim, font: { family: 'JetBrains Mono' } } } },
+            scales: {
+                x: { ticks: { color: colors.fgDim, font: { size: 10, family: 'JetBrains Mono' } }, grid: { color: colors.border } },
+                y: { ticks: { color: colors.fgDim }, grid: { color: colors.border }, title: { display: true, text: 'tok/s', color: colors.fgDim } }
+            }
+        }
+    });
+}
+</script>
+{{end}}

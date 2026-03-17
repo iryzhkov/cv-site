@@ -1,0 +1,268 @@
+{{define "title"}}igor@cv-site:~/admin{{end}}
+{{define "page-id"}}admin{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> admin --dashboard</div>
+</div>
+
+<!-- Stats -->
+<div class="term-section">
+    <pre class="term-pre" style="background:none;border:none;padding:0">
+<span style="color:var(--term-accent)">Stats</span>{{if .FilterCompany}} (filtered: {{.FilterCompany}}){{end}}
+  Unique Visitors:     <span style="color:var(--term-fg-bold)">{{.TotalSessions}}</span>{{if .FilterCompany}}  (all: {{.AllSessions}}){{end}}
+  Page Views:          <span style="color:var(--term-fg-bold)">{{.TotalVisits}}</span>{{if .FilterCompany}}  (all: {{.AllVisits}}){{end}}
+  Companies Tracked:   <span style="color:var(--term-fg-bold)">{{len .Companies}}</span>
+  Active Tokens:       <span style="color:var(--term-fg-bold)">{{len .Tokens}}</span>
+</pre>
+</div>
+
+<!-- Filters -->
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">Filters</div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px">
+        <div>
+            <span style="color:var(--term-fg-dim)">Company:</span>
+            <select id="filter-company" class="terminal-select" onchange="applyFilter()">
+                <option value="">All</option>
+                {{range .CompanyNames}}
+                <option value="{{.}}" {{if eq . $.FilterCompany}}selected{{end}}>{{.}}</option>
+                {{end}}
+            </select>
+        </div>
+        <div>
+            <span style="color:var(--term-fg-dim)">Period:</span>
+            <select id="filter-period" class="terminal-select" onchange="loadChart()">
+                <option value="24h" selected>Last 24h</option>
+                <option value="7d">Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="all">All time</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Usage Chart -->
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">Usage Over Time</div>
+    <div style="border:1px solid var(--term-border);padding:12px;margin-top:4px">
+        <canvas id="usage-chart" height="120"></canvas>
+    </div>
+</div>
+
+<!-- Token Usage Chart -->
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">LLM Tokens Over Time</div>
+    <div style="border:1px solid var(--term-border);padding:12px;margin-top:4px">
+        <canvas id="token-chart" height="120"></canvas>
+    </div>
+</div>
+
+<!-- Top Pages -->
+{{if .TopPages}}
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">Top Pages{{if .FilterCompany}} ({{.FilterCompany}}){{end}}</div>
+    {{range .TopPages}}
+    <div class="term-line"><span style="color:var(--term-fg-dim);display:inline-block;min-width:40px;text-align:right">{{.Count}}</span>  {{.Path}}</div>
+    {{end}}
+</div>
+{{end}}
+
+<!-- Company Visits -->
+{{if .Companies}}
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">Company Visits</div>
+    {{range .Companies}}
+    <a href="/admin?company={{.Company}}" class="term-entry">
+        <span class="entry-name" style="min-width:160px">{{.Company}}</span>
+        <span style="color:var(--term-fg-dim)">{{.Sessions}} visitors, {{.Views}} views</span>
+    </a>
+    {{end}}
+</div>
+{{end}}
+
+<!-- LLM Token Usage -->
+{{if .ModelUsage}}
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">LLM Token Usage{{if .FilterCompany}} ({{.FilterCompany}}){{end}}</div>
+    <pre class="term-pre" style="background:none;border:none;padding:0;margin-top:4px">
+<span style="color:var(--term-fg-dim)">  Model                  Requests   Input Tok   Output Tok</span>
+<span style="color:var(--term-fg-dim)">  ─────────────────────  ────────   ─────────   ──────────</span>{{range .ModelUsage}}
+  <span style="color:var(--term-fg-bold)">{{printf "%-21s" .Model}}</span>  {{printf "%8d" .Requests}}   {{printf "%9d" .InputTokens}}   {{printf "%10d" .OutputTokens}}{{end}}
+</pre>
+</div>
+{{end}}
+
+<!-- Token Management -->
+<div class="term-section">
+    <div class="term-line" style="color:var(--term-accent)">Access Tokens</div>
+    <form method="POST" action="/admin/tokens/create" hx-boost="false" style="display:flex;gap:8px;margin:8px 0">
+        <input type="text" name="company" class="terminal-input" placeholder="Company name"
+               style="border-bottom:1px solid var(--term-border);padding:4px 0;max-width:200px">
+        <button type="submit" class="terminal-btn">[Create]</button>
+    </form>
+    {{range .Tokens}}
+    <div style="margin:6px 0;padding:6px 8px;border:1px solid var(--term-border);border-radius:2px">
+        <div class="term-line">
+            <span style="color:var(--term-fg-bold)">{{.Company}}</span>
+            {{if .Active}}
+            <form method="POST" action="/admin/tokens/revoke" hx-boost="false" style="display:inline">
+                <input type="hidden" name="token" value="{{.Token}}">
+                <button type="submit" style="background:none;border:none;color:var(--term-warning);font-family:inherit;font-size:inherit;cursor:pointer">[revoke]</button>
+            </form>
+            {{else}}
+            <span style="color:var(--term-error)">[revoked]</span>
+            {{end}}
+            <form method="POST" action="/admin/tokens/delete" hx-boost="false" style="display:inline">
+                <input type="hidden" name="token" value="{{.Token}}">
+                <button type="submit" style="background:none;border:none;color:var(--term-error);font-family:inherit;font-size:inherit;cursor:pointer">[delete]</button>
+            </form>
+        </div>
+        {{if .Active}}
+        <div class="term-line" style="margin-top:2px">
+            <span style="color:var(--term-fg-dim);font-size:13px">URL: </span>
+            <input type="text" readonly value="https://cv.ryzhkov.dev/?t={{.Token}}" class="terminal-input" style="font-size:13px;color:var(--term-accent);cursor:text;max-width:400px" onclick="this.select();document.execCommand('copy')">
+            <span class="copy-hint" style="color:var(--term-fg-dim);font-size:11px"> (click to copy)</span>
+        </div>
+        {{end}}
+    </div>
+    {{end}}
+</div>
+
+<script src="/static/chart.min.js"></script>
+<script>
+const CHART_COLORS = [
+    'rgba(99, 102, 241, 0.8)',
+    'rgba(34, 197, 94, 0.8)',
+    'rgba(249, 115, 22, 0.8)',
+    'rgba(236, 72, 153, 0.8)',
+    'rgba(14, 165, 233, 0.8)',
+];
+
+let usageChart = null;
+let tokenChart = null;
+
+function applyFilter() {
+    const company = document.getElementById('filter-company').value;
+    const url = company ? '/admin?company=' + encodeURIComponent(company) : '/admin';
+    window.location.href = url;
+}
+
+function loadChart() {
+    const company = document.getElementById('filter-company').value;
+    const period = document.getElementById('filter-period').value;
+    let url = '/admin/chart-data?period=' + period;
+    if (company) url += '&company=' + encodeURIComponent(company);
+
+    fetch(url)
+        .then(r => r.json())
+        .then(data => renderChart(data))
+        .catch(err => console.error('Chart data error:', err));
+}
+
+function chartOptions(colors, yLabel) {
+    return {
+        responsive: true,
+        animation: { duration: 300 },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: {
+                labels: {
+                    color: colors.fgDim,
+                    font: { family: 'JetBrains Mono, monospace', size: 11 },
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: colors.fgDim, font: { size: 10, family: 'JetBrains Mono, monospace' } },
+                grid: { color: colors.border }
+            },
+            y: {
+                ticks: { color: colors.fgDim },
+                grid: { color: colors.border },
+                beginAtZero: true,
+                title: { display: true, text: yLabel, color: colors.fgDim }
+            }
+        }
+    };
+}
+
+function renderChart(data) {
+    const colors = window.Terminal?.getThemeColors() || {
+        accent: '#7aa2f7', fgDim: '#565f89', border: '#292e42'
+    };
+
+    // Usage chart
+    const ctx = document.getElementById('usage-chart').getContext('2d');
+    if (usageChart) usageChart.destroy();
+
+    const datasets = [{
+        label: 'Total',
+        data: data.total,
+        borderColor: colors.accent,
+        backgroundColor: colors.accent + '30',
+        fill: true,
+        tension: 0.3,
+        borderWidth: 2,
+    }];
+
+    if (data.pages) {
+        data.pages.forEach((p, i) => {
+            datasets.push({
+                label: p.page,
+                data: p.data,
+                borderColor: CHART_COLORS[i % CHART_COLORS.length],
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                borderWidth: 1.5,
+                borderDash: [4, 2],
+            });
+        });
+    }
+
+    usageChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: data.labels, datasets: datasets },
+        options: chartOptions(colors, 'views'),
+    });
+
+    // Token usage chart
+    const ctx2 = document.getElementById('token-chart').getContext('2d');
+    if (tokenChart) tokenChart.destroy();
+
+    const hasTokenData = data.inputTok?.some(v => v > 0) || data.outputTok?.some(v => v > 0);
+    if (!hasTokenData) {
+        ctx2.canvas.parentElement.querySelector('.term-line')?.remove();
+        ctx2.canvas.style.display = 'none';
+        ctx2.canvas.parentElement.innerHTML = '<span style="color:var(--term-fg-dim)">No LLM usage data for this period</span>';
+        return;
+    }
+
+    tokenChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [
+                {
+                    label: 'Input tokens',
+                    data: data.inputTok,
+                    backgroundColor: CHART_COLORS[0],
+                    borderWidth: 0,
+                },
+                {
+                    label: 'Output tokens',
+                    data: data.outputTok,
+                    backgroundColor: CHART_COLORS[1],
+                    borderWidth: 0,
+                },
+            ]
+        },
+        options: chartOptions(colors, 'tokens'),
+    });
+}
+
+// Load chart on page load
+loadChart();
+</script>
+{{end}}

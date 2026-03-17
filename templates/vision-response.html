@@ -1,0 +1,28 @@
+{{define "vision-response"}}
+<div class="term-section">
+    <div class="term-line dim">Analysis:</div>
+    <div class="prose-container cursor-blink" id="vision-response-{{.StreamID}}"></div>
+    <div class="chat-meta" id="vision-meta-{{.StreamID}}"></div>
+</div>
+
+<script>
+(function() {
+    const streamID = "{{.StreamID}}";
+    const el = document.getElementById("vision-response-" + streamID);
+    const metaEl = document.getElementById("vision-meta-" + streamID);
+    let raw = "";
+    const source = new EventSource("/api/stream?id=" + streamID);
+    source.addEventListener("token", function(e) {
+        try { raw += JSON.parse(e.data); } catch { raw += e.data; }
+        el.innerHTML = marked.parse(raw);
+    });
+    source.addEventListener("done", function(e) {
+        source.close();
+        el.classList.remove("cursor-blink");
+        el.innerHTML = marked.parse(raw);
+        metaEl.innerHTML = e.data;
+    });
+    source.addEventListener("error", function() { source.close(); el.classList.remove("cursor-blink"); });
+})();
+</script>
+{{end}}

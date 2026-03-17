@@ -1,0 +1,11 @@
+{{define "gpu-status"}}
+{{if .GPUOnline}}
+<span class="gpu-badge online">[GPU:RTX4090:READY]</span>
+{{else}}
+<span class="gpu-badge fallback">[CPU:FALLBACK]</span>
+{{end}}
+{{end}}
+
+{{define "gpu-widget"}}
+<span id="gpu-status" hx-get="/api/gpu-status" hx-trigger="load, every 5s" hx-swap="innerHTML" style="font-size:12px;color:var(--term-fg-dim)">[GPU:checking...]</span>
+{{end}}
