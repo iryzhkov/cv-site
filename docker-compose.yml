@@ -8,7 +8,7 @@ services:
       - PORT=8091
       - OLLAMA_URL=http://192.168.70.130:8080
       - ADMIN_KEY=${ADMIN_KEY:-changeme}
-      - DISCORD_WEBHOOK=https://discord.com/api/webhooks/1483581689476157541/AROXwf7gNFtPJQsO18TS_A9vDnL_x5weM1njfLyH-TmPXxv6U5lsJi7DAbwD4Rz9j2DR
+      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK}
     volumes:
       - ./data:/app/data
     restart: unless-stopped
