@@ -13,6 +13,7 @@ import (
 func main() {
 	cfg := LoadConfig()
 	ollama.BaseURL = cfg.OllamaURL
+	handlers.N8NWebhookURL = cfg.N8NWebhookURL
 
 	// Load tokens
 	middleware.LoadTokens()
@@ -30,7 +31,7 @@ func main() {
 	pages := []string{
 		"home.html", "about.html", "404.html",
 		"playground.html", "projects.html", "project.html",
-		"benchmarks.html", "rag.html", "vision.html", "admin.html",
+		"benchmarks.html", "rag.html", "vision.html", "admin.html", "contact.html",
 	}
 	funcMap := template.FuncMap{
 		"raw": func(s string) template.HTML { return template.HTML(s) },
@@ -80,6 +81,7 @@ func main() {
 	mux.HandleFunc("/benchmarks", handlers.Benchmarks)
 	mux.HandleFunc("/rag", handlers.RAG)
 	mux.HandleFunc("/vision", handlers.Vision)
+	mux.HandleFunc("/contact", handlers.Contact)
 
 	// Admin (local only)
 	mux.HandleFunc("/admin", middleware.LocalOnly(handlers.Admin))
@@ -104,6 +106,7 @@ func main() {
 	mux.HandleFunc("/api/rag/ingest", handlers.RAGIngest)
 	mux.HandleFunc("/api/rag/query", handlers.RAGQuery)
 	mux.HandleFunc("/api/vision", handlers.VisionAnalyze)
+	mux.HandleFunc("/api/contact", handlers.ContactSubmit)
 
 	// Static files
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

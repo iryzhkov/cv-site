@@ -1,0 +1,35 @@
+{{define "title"}}igor@cv-site:~/contact{{end}}
+{{define "page-id"}}contact{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> mail igor</div>
+    <div class="term-line dim">Fill in the fields below. Press [Send] when ready.</div>
+</div>
+
+<div class="term-section">
+    <form hx-post="/api/contact" hx-target="#contact-result" hx-swap="innerHTML">
+        <div style="margin-bottom:12px">
+            <div class="term-line dim">Name: *</div>
+            <input type="text" name="name" class="terminal-input" required autocomplete="name"
+                   style="border-bottom:1px solid var(--term-border);padding:4px 0;max-width:400px">
+        </div>
+
+        <div style="margin-bottom:12px">
+            <div class="term-line dim">Email:</div>
+            <input type="email" name="email" class="terminal-input" autocomplete="email"
+                   style="border-bottom:1px solid var(--term-border);padding:4px 0;max-width:400px">
+        </div>
+
+        <div style="margin-bottom:12px">
+            <div class="term-line dim">Message: *</div>
+            <textarea name="message" class="terminal-textarea" rows="6" required
+                      placeholder="Type your message here..."></textarea>
+        </div>
+
+        <button type="submit" class="terminal-btn">[Send]</button>
+    </form>
+</div>
+
+<div id="contact-result"></div>
+{{end}}

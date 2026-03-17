@@ -3,16 +3,18 @@ package main
 import "os"
 
 type Config struct {
-	Port      string
-	OllamaURL string
-	AdminKey  string
+	Port          string
+	OllamaURL     string
+	AdminKey      string
+	N8NWebhookURL string
 }
 
 func LoadConfig() Config {
 	cfg := Config{
-		Port:      os.Getenv("PORT"),
-		OllamaURL: os.Getenv("OLLAMA_URL"),
-		AdminKey:  os.Getenv("ADMIN_KEY"),
+		Port:          os.Getenv("PORT"),
+		OllamaURL:     os.Getenv("OLLAMA_URL"),
+		AdminKey:      os.Getenv("ADMIN_KEY"),
+		N8NWebhookURL: os.Getenv("N8N_WEBHOOK_URL"),
 	}
 	if cfg.Port == "" {
 		cfg.Port = "8090"

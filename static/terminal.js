@@ -29,6 +29,7 @@
         { name: 'projects', href: '/projects', aliases: ['projects', 'proj'] },
         { name: 'play', href: '/playground', aliases: ['play', 'playground', 'chat', 'p'] },
         { name: 'bench', href: '/benchmarks', aliases: ['bench', 'benchmarks', 'b'] },
+        { name: 'contact', href: '/contact', aliases: ['contact', 'mail', 'c'] },
     ];
 
     function getActiveTabIndex() {
