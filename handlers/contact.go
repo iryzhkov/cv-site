@@ -77,15 +77,13 @@ func processContact(msg ContactMessage) {
 	// Spam check via Ollama
 	msg.IsSpam = checkSpam(msg)
 
-	// Save to file
-	saveContact(msg)
-
 	// Send to Discord if not spam
 	if !msg.IsSpam && DiscordWebhookURL != "" {
 		msg.Notified = sendDiscord(msg)
-		// Re-save with notified status
-		// (not critical — the initial save already has the message)
 	}
+
+	// Save to file (after all processing)
+	saveContact(msg)
 }
 
 func checkSpam(msg ContactMessage) bool {
