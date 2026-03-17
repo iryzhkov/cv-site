@@ -356,12 +356,82 @@
         }
     }
 
+    // --- Typewriter Animation (first visit per tab) ---
+    function getVisitedTabs() {
+        try { return JSON.parse(sessionStorage.getItem('cv-visited-tabs') || '{}'); } catch { return {}; }
+    }
+
+    function markTabVisited(path) {
+        const visited = getVisitedTabs();
+        visited[path] = true;
+        sessionStorage.setItem('cv-visited-tabs', JSON.stringify(visited));
+    }
+
+    function typewriterIntro() {
+        const path = window.location.pathname;
+        if (getVisitedTabs()[path]) return;
+        markTabVisited(path);
+
+        const content = document.getElementById('terminal-content');
+        if (!content) return;
+
+        const children = Array.from(content.children);
+        if (children.length === 0) return;
+
+        // Hide all children
+        children.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(2px)';
+        });
+
+        // Reveal line by line
+        let delay = 100;
+        children.forEach((el) => {
+            const tag = el.tagName.toLowerCase();
+            if (tag === 'pre' || el.classList.contains('neofetch-box')) {
+                typewriterPre(el, delay);
+                delay += Math.min(el.textContent.length * 6, 2000);
+            } else {
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, delay);
+                delay += 40;
+            }
+        });
+    }
+
+    function typewriterPre(el, startDelay) {
+        const fullText = el.innerHTML;
+        el.innerHTML = '';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+
+        let charIndex = 0;
+        const speed = 6; // ms per character — fast typing
+        const maxChars = fullText.length;
+
+        setTimeout(() => {
+            function type() {
+                if (charIndex < maxChars) {
+                    const chunk = Math.min(4, maxChars - charIndex);
+                    el.innerHTML = fullText.substring(0, charIndex + chunk);
+                    charIndex += chunk;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }, startDelay);
+    }
+
     // --- Init ---
     function init() {
         applyTheme(currentTheme);
         highlightActiveTab();
         updateStatusBar();
         document.addEventListener('keydown', handleKeyDown);
+        typewriterIntro();
 
         // Re-highlight tabs after HTMX navigation
         document.body.addEventListener('htmx:afterSettle', () => {
