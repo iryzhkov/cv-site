@@ -363,7 +363,7 @@ func APICreateToken(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"token":   token,
 		"company": req.Company,
-		"url":     "https://cv.ryzhkov.dev/?t=" + token,
+		"url":     "https://igor.ryzhkov.dev/?t=" + token,
 	})
 }
 
