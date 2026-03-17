@@ -133,7 +133,8 @@ func Admin(w http.ResponseWriter, r *http.Request) {
 		"FilterCompany":  filterCompany,
 		"Tokens":         tokens,
 		"ModelUsage":     modelUsageList,
-		"Contacts":       ReadContacts(),
+		"UnreadMessages": UnreadCount(),
+		"TotalMessages":  len(ReadContacts()),
 		"Active":         "admin",
 	})
 }

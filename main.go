@@ -32,6 +32,7 @@ func main() {
 		"home.html", "about.html", "404.html",
 		"playground.html", "projects.html", "project.html",
 		"benchmarks.html", "rag.html", "vision.html", "admin.html", "contact.html",
+		"messages.html",
 	}
 	funcMap := template.FuncMap{
 		"raw": func(s string) template.HTML { return template.HTML(s) },
@@ -86,6 +87,8 @@ func main() {
 	// Admin (local only)
 	mux.HandleFunc("/admin", middleware.LocalOnly(handlers.Admin))
 	mux.HandleFunc("/admin/chart-data", middleware.LocalOnly(handlers.AdminChartData))
+	mux.HandleFunc("/admin/messages", middleware.LocalOnly(handlers.AdminMessages))
+	mux.HandleFunc("/admin/messages/action", middleware.LocalOnly(handlers.AdminMessageAction))
 	mux.HandleFunc("/admin/tokens/create", middleware.LocalOnly(handlers.AdminCreateToken))
 	mux.HandleFunc("/admin/tokens/revoke", middleware.LocalOnly(handlers.AdminRevokeToken))
 	mux.HandleFunc("/admin/tokens/delete", middleware.LocalOnly(handlers.AdminDeleteToken))

@@ -1,0 +1,249 @@
+{{define "title"}}igor@cv-site:~/admin/messages{{end}}
+{{define "page-id"}}admin/messages{{end}}
+
+{{define "content"}}
+<div class="term-section">
+    <div class="term-line"><span class="term-prompt">$</span> mail --list</div>
+    <div class="term-line dim">j/k navigate | v visual select | s star | d delete | Enter open | r mark read | q back</div>
+</div>
+
+<!-- Action bar (hidden until visual select) -->
+<div id="action-bar" style="display:none;margin-bottom:8px">
+    <form id="action-form" method="POST" action="/admin/messages/action" hx-boost="false">
+        <input type="hidden" name="ids" id="action-ids">
+        <input type="hidden" name="action" id="action-type">
+        <button type="button" class="terminal-btn" onclick="doAction('star')">★ Star</button>
+        <button type="button" class="terminal-btn" onclick="doAction('read')">✓ Read</button>
+        <button type="button" class="terminal-btn" onclick="doAction('unread')">○ Unread</button>
+        <button type="button" class="terminal-btn" onclick="if(confirm('Delete selected messages?'))doAction('delete')">✕ Delete</button>
+        <span id="select-count" style="color:var(--term-fg-dim);margin-left:8px"></span>
+    </form>
+</div>
+
+<!-- Starred messages -->
+{{range .Messages}}{{if .Starred}}{{end}}{{end}}
+
+<div id="msg-list">
+    <!-- Starred -->
+    {{$hasStarred := false}}
+    {{range .Messages}}{{if .Starred}}{{$hasStarred = true}}{{end}}{{end}}
+    {{if $hasStarred}}
+    <div class="term-line dim" style="margin-bottom:4px">★ Starred</div>
+    {{range .Messages}}
+    {{if .Starred}}
+    <div class="msg-row term-entry" data-id="{{.ID}}" data-expanded="false">
+        <span style="color:var(--term-warning)">★</span>
+        {{if not .Read}}<span style="color:var(--term-accent)">●</span>{{else}}<span style="color:var(--term-fg-dim)">○</span>{{end}}
+        {{if .IsSpam}}<span style="color:var(--term-error)">[SPAM]</span>{{end}}
+        <span style="color:var(--term-fg-bold)">{{.Name}}</span>
+        {{if .Company}}<span style="color:var(--term-accent)">[{{.Company}}]</span>{{end}}
+        <span style="color:var(--term-fg-dim)">{{.Timestamp}}</span>
+        <div class="msg-preview" style="color:var(--term-fg-dim);margin-left:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{.Message}}</div>
+        <div class="msg-detail" style="display:none;margin:8px 0 8px 28px;padding:8px;border:1px solid var(--term-border)">
+            {{if .Email}}<div class="term-line dim">Email: {{.Email}}</div>{{end}}
+            <div style="white-space:pre-wrap;margin-top:4px">{{.Message}}</div>
+            <div style="margin-top:8px">
+                <button class="terminal-btn" onclick="singleAction('{{.ID}}','unstar')" style="font-size:12px">☆ Unstar</button>
+                {{if not .Read}}<button class="terminal-btn" onclick="singleAction('{{.ID}}','read')" style="font-size:12px">✓ Read</button>{{end}}
+                <button class="terminal-btn" onclick="if(confirm('Delete?'))singleAction('{{.ID}}','delete')" style="font-size:12px;color:var(--term-error)">✕ Delete</button>
+            </div>
+        </div>
+    </div>
+    {{end}}
+    {{end}}
+    {{end}}
+
+    <!-- All messages -->
+    <div class="term-line dim" style="margin:8px 0 4px">Inbox</div>
+    {{range .Messages}}
+    {{if not .Starred}}
+    <div class="msg-row term-entry" data-id="{{.ID}}" data-expanded="false">
+        <span style="color:var(--term-fg-dim)">☆</span>
+        {{if not .Read}}<span style="color:var(--term-accent)">●</span>{{else}}<span style="color:var(--term-fg-dim)">○</span>{{end}}
+        {{if .IsSpam}}<span style="color:var(--term-error)">[SPAM]</span>{{end}}
+        <span style="color:var(--term-fg-bold)">{{.Name}}</span>
+        {{if .Company}}<span style="color:var(--term-accent)">[{{.Company}}]</span>{{end}}
+        <span style="color:var(--term-fg-dim)">{{.Timestamp}}</span>
+        <div class="msg-preview" style="color:var(--term-fg-dim);margin-left:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{.Message}}</div>
+        <div class="msg-detail" style="display:none;margin:8px 0 8px 28px;padding:8px;border:1px solid var(--term-border)">
+            {{if .Email}}<div class="term-line dim">Email: {{.Email}}</div>{{end}}
+            <div style="white-space:pre-wrap;margin-top:4px">{{.Message}}</div>
+            <div style="margin-top:8px">
+                <button class="terminal-btn" onclick="singleAction('{{.ID}}','star')" style="font-size:12px">★ Star</button>
+                {{if not .Read}}<button class="terminal-btn" onclick="singleAction('{{.ID}}','read')" style="font-size:12px">✓ Read</button>{{end}}
+                <button class="terminal-btn" onclick="if(confirm('Delete?'))singleAction('{{.ID}}','delete')" style="font-size:12px;color:var(--term-error)">✕ Delete</button>
+            </div>
+        </div>
+    </div>
+    {{end}}
+    {{end}}
+</div>
+
+<div class="term-section" style="margin-top:16px">
+    <div class="term-line"><span class="term-prompt">$</span> <a href="/admin" style="color:var(--term-fg)">cd ..</a> <span style="color:var(--term-fg-dim)">(q)</span></div>
+</div>
+
+<script>
+const rows = document.querySelectorAll('.msg-row');
+let idx = -1;
+let visualMode = false;
+let selected = new Set();
+
+function highlight(newIdx) {
+    if (rows.length === 0) return;
+    if (newIdx < 0) newIdx = rows.length - 1;
+    if (newIdx >= rows.length) newIdx = 0;
+    rows.forEach(el => el.classList.remove('focused'));
+    idx = newIdx;
+    rows[idx].classList.add('focused');
+    rows[idx].scrollIntoView({ block: 'nearest' });
+
+    if (visualMode) {
+        toggleSelect(idx);
+    }
+}
+
+function toggleSelect(i) {
+    const id = rows[i].dataset.id;
+    if (selected.has(id)) {
+        selected.delete(id);
+        rows[i].style.background = '';
+    } else {
+        selected.add(id);
+        rows[i].style.background = 'var(--term-selection)';
+    }
+    updateActionBar();
+}
+
+function updateActionBar() {
+    const bar = document.getElementById('action-bar');
+    const count = document.getElementById('select-count');
+    if (selected.size > 0) {
+        bar.style.display = 'block';
+        count.textContent = selected.size + ' selected';
+    } else {
+        bar.style.display = 'none';
+    }
+}
+
+function doAction(action) {
+    document.getElementById('action-ids').value = Array.from(selected).join(',');
+    document.getElementById('action-type').value = action;
+    if (action === 'delete' && !confirm('Delete ' + selected.size + ' message(s)?')) return;
+    document.getElementById('action-form').submit();
+}
+
+function singleAction(id, action) {
+    document.getElementById('action-ids').value = id;
+    document.getElementById('action-type').value = action;
+    document.getElementById('action-form').submit();
+}
+
+function toggleExpand(i) {
+    const row = rows[i];
+    const detail = row.querySelector('.msg-detail');
+    const preview = row.querySelector('.msg-preview');
+    const expanded = row.dataset.expanded === 'true';
+    if (expanded) {
+        detail.style.display = 'none';
+        preview.style.display = 'block';
+        row.dataset.expanded = 'false';
+    } else {
+        detail.style.display = 'block';
+        preview.style.display = 'none';
+        row.dataset.expanded = 'true';
+        // Mark as read
+        const id = row.dataset.id;
+        fetch('/admin/messages/action', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'action=read&ids=' + id
+        });
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (!document.getElementById('command-input')?.classList.contains('hidden')) return;
+
+    switch(e.key) {
+        case 'j':
+            highlight(idx + 1);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'k':
+            highlight(idx - 1);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'Enter':
+            if (idx >= 0) toggleExpand(idx);
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'v':
+            visualMode = !visualMode;
+            if (!visualMode) {
+                // Clear selection
+                selected.clear();
+                rows.forEach(r => r.style.background = '');
+                updateActionBar();
+            } else if (idx >= 0) {
+                toggleSelect(idx);
+            }
+            // Update status
+            const mode = document.getElementById('status-mode');
+            if (mode) mode.textContent = visualMode ? 'VISUAL' : 'NORMAL';
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 's':
+            if (idx >= 0 && !visualMode) {
+                singleAction(rows[idx].dataset.id, 'star');
+            } else if (selected.size > 0) {
+                doAction('star');
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'd':
+            if (idx >= 0 && !visualMode) {
+                if (confirm('Delete this message?')) singleAction(rows[idx].dataset.id, 'delete');
+            } else if (selected.size > 0) {
+                doAction('delete');
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'r':
+            if (idx >= 0 && !visualMode) {
+                singleAction(rows[idx].dataset.id, 'read');
+            } else if (selected.size > 0) {
+                doAction('read');
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'q':
+            window.location.href = '/admin';
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+        case 'Escape':
+            if (visualMode) {
+                visualMode = false;
+                selected.clear();
+                rows.forEach(r => r.style.background = '');
+                updateActionBar();
+                const m = document.getElementById('status-mode');
+                if (m) m.textContent = 'NORMAL';
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+    }
+}, true);
+</script>
+{{end}}
