@@ -20,7 +20,7 @@ func LoadConfig() Config {
 		cfg.Port = "8090"
 	}
 	if cfg.OllamaURL == "" {
-		cfg.OllamaURL = "http://192.168.70.130:8080"
+		cfg.OllamaURL = "http://192.168.70.223:8080"
 	}
 	if cfg.AdminKey == "" {
 		cfg.AdminKey = "changeme"

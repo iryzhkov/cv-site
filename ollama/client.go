@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var BaseURL = "http://192.168.70.130:8080"
+var BaseURL = "http://192.168.70.223:8080"
 
 // Model represents an Ollama model.
 type Model struct {
