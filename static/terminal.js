@@ -26,7 +26,6 @@
     const TABS = [
         { name: 'home', href: '/', aliases: ['home', 'h'] },
         { name: 'about', href: '/about', aliases: ['about', 'a'] },
-        { name: 'history', href: '/history', aliases: ['history', 'hist', 'log'] },
         { name: 'projects', href: '/projects', aliases: ['projects', 'proj'] },
         { name: 'llm', href: '/playground', aliases: ['llm', 'play', 'playground', 'chat', 'p'] },
         { name: 'contact', href: '/contact', aliases: ['contact', 'mail', 'c'] },
