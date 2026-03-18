@@ -414,6 +414,12 @@ a:hover {
     font-weight: 600;
 }
 
+.terminal-tabs .tab.external::after {
+    content: ' \2197';
+    font-size: 10px;
+    opacity: 0.5;
+}
+
 /* ---------- Content Area ---------- */
 .terminal-content {
     flex: 1;
