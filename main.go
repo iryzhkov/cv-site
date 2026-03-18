@@ -29,7 +29,7 @@ func main() {
 		"templates/partials/loading.html",
 	}
 	pages := []string{
-		"home.html", "about.html", "404.html",
+		"home.html", "about.html", "history.html", "404.html",
 		"playground.html", "projects.html", "project.html",
 		"benchmarks.html", "rag.html", "vision.html", "admin.html", "contact.html",
 		"messages.html",
@@ -76,6 +76,7 @@ func main() {
 	// Pages
 	mux.HandleFunc("/", handlers.Home)
 	mux.HandleFunc("/about", handlers.About)
+	mux.HandleFunc("/history", handlers.History)
 	mux.HandleFunc("/projects", handlers.ProjectsIndex)
 	mux.HandleFunc("/projects/", handlers.ProjectDetail)
 	mux.HandleFunc("/playground", handlers.Playground)
@@ -118,6 +119,7 @@ func main() {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://igor.ryzhkov.dev/</loc></url>
   <url><loc>https://igor.ryzhkov.dev/about</loc></url>
+  <url><loc>https://igor.ryzhkov.dev/history</loc></url>
   <url><loc>https://igor.ryzhkov.dev/projects</loc></url>
   <url><loc>https://igor.ryzhkov.dev/playground</loc></url>
   <url><loc>https://igor.ryzhkov.dev/contact</loc></url>
